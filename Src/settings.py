@@ -1,25 +1,38 @@
+from Src.exceptions import exception_proxy
 
-
-class settings:
-    __first_name = ""
+#
+# Класс для описания настроек
+#
+class settings():
+    _inn = 0
+    _short_name = ""
     
     @property
-    def first_name(self):
-        return self.__first_name
+    def inn(self):
+        """
+            ИНН
+        Returns:
+            int: 
+        """
+        return self._inn
     
-    @first_name.setter
-    def first_name(self, value: str):
+    @inn.setter
+    def inn(self, value: int):
+        exception_proxy.validate(value, int)
+        self._inn = value
+         
+    @property     
+    def short_name(self):
         """
-            Полное наименование
-        Args:
-            value (str): _description_
-
-        Raises:
-            Exception: _description_
+            Короткое наименование организации
+        Returns:
+            str:
         """
-        if not isinstance(value, str):
-            raise Exception("Некорректный аргумент!")
-        
-        self.__first_name = value.strip()
-        
-        
+        return self._short_name
+    
+    @short_name.setter
+    def short_name(self, value:str):
+        exception_proxy.validate(value, str)
+        self._short_name = value
+            
+    
