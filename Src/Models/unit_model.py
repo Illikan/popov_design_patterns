@@ -12,14 +12,14 @@ class unit_model(reference):
     # Коэффициент пересчета к базовой единице измерения
     __coefficient: int = 1
     
-    def __init__(self, name: str, base_unit: reference = None, coefficient: int = 1 ):
+    def __init__(self, name: str, base: reference = None, coeff: int = 1 ):
         super().__init__(name)
         
-        if base_unit != None:
-            self.base_unit = base_unit
+        if base != None:
+            self.base_unit = base
             
-        if coefficient != 1:
-            self.coefficient = coefficient    
+        if coeff != 1:
+            self.coefficient = coeff   
         
     
     @property
@@ -33,7 +33,7 @@ class unit_model(reference):
     
     
     @base_unit.setter
-    def base(self, value: reference ):
+    def base_unit(self, value: reference ):
         exception_proxy.validate(value, reference)
         self.__base_unit = value
         
@@ -55,6 +55,30 @@ class unit_model(reference):
             raise argument_exception("Значение коэффициента должно быть > 1!")
         
         self.__coefficient = value  
+        
+        
+    @staticmethod    
+    def create_gram():
+        """
+            Создать единицу измерения грамм
+
+        Returns:
+            _type_: _description_
+        """
+        item = unit_model("грамм", None, 1)
+        return item    
+    
+    @staticmethod
+    def create_killogram():
+        """
+            Создать единицу килограмм
+        Returns:
+            _type_: _description_
+        """
+        base = unit_model.create_gram()
+        item = unit_model("киллограмм", base, 1000)
+        return item
+        
         
         
         
