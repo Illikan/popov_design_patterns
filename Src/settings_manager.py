@@ -4,7 +4,7 @@ import uuid
 
 from Src.settings import settings
 from Src.errors import error_proxy
-from Src.exceptions import exception_proxy
+from Src.exceptions import exception_proxy, argument_exception
 
 
 #
@@ -22,12 +22,13 @@ class settings_manager(object):
     # Описание ошибок
     _error = error_proxy()
     
+    
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls.instance = super(settings_manager, cls).__new__(cls)
         return cls.instance  
       
-
+    
     def __init__(self):
         if self._uniqueNumber is None:
             self._uniqueNumber = uuid.uuid4()
@@ -87,7 +88,18 @@ class settings_manager(object):
                 if not isinstance(value, list) and not isinstance(value, dict):
                     setattr(self._settings, field, value)
                 
+    def __convert(self):
         
+        if not len(self.__data):
+            raise argument_exception("Невозможно создать объект типа Settings")
+
+        self.__settings = settings()
+
+        fields = dir(self.__settings)
+
+        for field in fields:
+            if field not in self.data.keys(): continue
+            setattr(self.__settings, field, self.data[field])
     
     @property    
     def settings(self) -> settings:

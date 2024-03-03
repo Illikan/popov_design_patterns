@@ -21,7 +21,7 @@ class settings_test(unittest.TestCase):
         print(manager.data)
         print(type(manager.data))
         assert result is not None
-        assert manager.settings.inn > 0
+        assert int(manager.settings.inn) > 0
         assert manager.settings.short_name != ""
         
     #

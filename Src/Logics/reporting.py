@@ -1,13 +1,21 @@
-from abc import ABC
+import sys
+sys.path.append('c:\\Users\\ze_us\\Documents\\VSProjects\\Shab_proek_2_sem\\gitclone\\popov_design_patterns')
+
+import abc
 from Src.settings import settings
+from Src.Storage import storage
 from Src.exceptions import exception_proxy, operation_exception
-class reporting(ABC):
+from Src.reference import reference
+#import json
+
+class reporting(abc.ABC):
     # Настройки
     __settings: settings = None
     # Набор данных
     __data = {}
     # Поля
     __fields = []
+    
     def __init__(self, _setting: settings, _data):
         """
 
@@ -20,9 +28,10 @@ class reporting(ABC):
         
         self.__data = _data
         self.__settings = _setting
+        
     
-    #@ABC.__abstractmethods__
-    def create(self, typeKey: str):
+    #@abc.abstractclassmethod
+    def create(self, typeKey: str) -> str:
         """
         Сформировать отчет
 
@@ -30,8 +39,24 @@ class reporting(ABC):
             typeKey (str): Ключ тип данных
         """
         exception_proxy.validate(typeKey, str)
-        self.__fields = self.build(typeKey, self.data)
-        pass
+        self.__fields = self.build(typeKey, self.__data)
+        
+        return ""
+    
+    @staticmethod
+    def make_element(attr) -> str:
+        """
+            Вспомогательная функция для нахождения значения атрибута
+        """
+        if isinstance(attr, reference):
+            return attr.name
+        elif attr is None:
+            return " "
+        elif isinstance(attr, str):
+            if len(attr) > 0:
+                return attr
+        elif isinstance(attr, (int, bool)):
+            return str(attr)
     
     @staticmethod
     def build(typeKey: str, data: dict) -> list:
@@ -56,8 +81,7 @@ class reporting(ABC):
             raise operation_exception("Набор данных пуст!")
         
         item = data[typeKey][0]
-        result = list(filter(lambda x: x.startswith("_") and not x.startswith("__"), dir(item)))        
-
+        result = list(filter(lambda x: not x.startswith("_") and not x.startswith("create_") and not x.startswith("is_") and not x == "description", dir(item)))        
         return result
     
     def _build(self, typeKey: str) -> list:
