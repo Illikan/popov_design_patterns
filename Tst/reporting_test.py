@@ -1,86 +1,108 @@
-import sys
-sys.path.append('c:\\Users\\ze_us\\Documents\\VSProjects\\Shab_proek_2_sem\\gitclone\\popov_design_patterns')
-
 import unittest
 from Src.Logics.reporting import reporting
 from Src.Models.unit_model import unit_model
-from Src.Models.group_model import group_model
-from Src.Models.nomenclature_model import nomenclature_model
 from Src.Storage.storage import storage
 from Src.Logics.csv_reporting import csv_reporting
-from Src.settings_manager import settings_manager
+from Src.Models.nomenclature_model import nomenclature_model
+from Src.Models.group_model import group_model
+from Src.Logics.markdown_reporting import markdown_reporting
+
 
 class reporting_test(unittest.TestCase):
     
     
     #
-    #Проверить статический метод build класса reporting
+    # Проверить статический метод build класса reporting
     #
     def test_check_reporting_build(self):
-        #Подготовка
+        # Подготовка
         data = {}
         list = []
         item = unit_model.create_gram()
         list.append(item)
-        data[ storage.unit_key() ] = list
-        #Действие
-        result = reporting.build( storage.unit_key(), data)
+        data[  storage.unit_key()  ] = list 
         
-        #Проверки
+        # Дейстие
+        result = reporting.build( storage.unit_key(), data )
+        
+        # Проверки
         assert result is not None
         assert len(result) > 0
-    def test_check_csv_create(self):
-        #Подготовка
-        data_unit = {}
-        data_group = {}
-        data_nomenclature = {}
         
-        list_unit = []
-        list_group = []
-        list_nomenclature = []
         
-        group = group_model("test group")
-        unit = unit_model("test unit")
+    #
+    # Проверить формированеи отчета в csv формате по единицам измерения
+    #    
+    def test_check_csv_create_unit_key(self):
+        # Подготовка
+        data = {}
+        list = []
+        item = unit_model.create_gram()
+        list.append(item)
+        key = storage.unit_key()
+        data[  key  ] = list 
+        report = csv_reporting( data )
         
-        item_unit = unit_model.create_gram()
-        item_group = group_model.create_group()
-        item_nomenclature = nomenclature_model("test")
+        # Действие
+        result = report.create( key )
         
-        item_nomenclature.group = group
-        item_nomenclature.unit = unit
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
         
-        list_unit.append(item_unit)
-        list_group.append(item_group)
-        list_nomenclature.append(item_nomenclature)
-       
-        data_unit[ storage.unit_key() ] = list_unit
-        data_group[ storage.group_key() ] = list_group
-        data_nomenclature[ storage.nomenclature_key() ] = list_nomenclature
         
-        manager = settings_manager()
+    #
+    # Проверить формирование отчета в csv формате по номенклатуре
+    #           
+    def test_check_csv_create_nomenclature_key(self):
+        # Подготовка
+        data = {}
+        list = []
         
-        report_unit = csv_reporting( manager.settings, data_unit)
-        report_group = csv_reporting( manager.settings, data_group)
-        report_nomenclature = csv_reporting( manager.settings, data_nomenclature)
+        unit = unit_model.create_killogram()
+        group = group_model.create_default_group()
+        item = nomenclature_model("Тушка бройлера", group, unit )
+        item.description = "Ингредиент для салата"
+        list.append(item)
         
-        #Действие
-        result_unit = report_unit.create( storage.unit_key() )
-        result_group = report_group.create( storage.group_key() )
-        result_nomenclature = report_nomenclature.create( storage.nomenclature_key() )
-
-        print(result_unit)
-        print(result_group)
-        print(result_nomenclature)
+        key = storage.nomenclature_key()
         
-        #Проверки
-        assert result_unit is not None
-        assert len(result_unit) > 0
-        assert len(result_unit.split(';')) == 7
+        data[  key  ] = list 
+        report = csv_reporting(  data )
         
-        assert result_group is not None
-        assert len(result_group) > 0   
-        assert len(result_group.split(';')) == 3
+        # Действие
+        result = report.create( key )
         
-        assert result_nomenclature is not None
-        assert len(result_nomenclature) > 0
-        assert len(result_nomenclature.split(';')) == 7
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
+           
+        file = open("csv_report.csv", "w")
+        file.write(result)
+        file.close()
+        
+        
+    #
+    # Проверить формитирование отчета в markdown формате по ед / измерениям
+    #    
+    def test_check_markdown_create_unit_key(self):
+         # Подготовка
+        data = {}
+        list = []
+        item = unit_model.create_gram()
+        list.append(item)
+        key = storage.unit_key()
+        data[  key  ] = list 
+        report = markdown_reporting(  data )
+        
+        # Действие
+        result = report.create( key )
+        
+        # Проверки
+        assert result is not None
+        assert len(result) > 0
+        
+        file = open("markdown_report.md", "w")
+        file.write(result)
+        file.close()
+        

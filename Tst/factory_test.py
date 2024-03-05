@@ -7,27 +7,27 @@ import unittest
 
 #
 # Набор автотестов для проверки работы фабричного метода
-# #
+# 
 class factory_test(unittest.TestCase):
 
     #
-    # Проверка создания ед. измерения
-    #
-    def test_check_factory(self):
+    # Проверка создания начальных рецептов
+    #    
+    def test_check_create_receipts(self):
         # Подготовка
-        unit = unit_model.create_killogram()
+        items = start_factory.create_receipts()
         
         # Действие
         
         # Проверки
-        assert unit is not None
+        assert len(items) > 0     
         
     # 
     # Проверка создание начальной номенклатуры
     #    
-    def test_check_create_nomenclature(self):
+    def test_check_create_nomenclatures(self):
         # Подготовка
-        items = start_factory.create_nomenclature()
+        items = start_factory.create_nomenclatures()
         
         # действие
         
@@ -35,10 +35,35 @@ class factory_test(unittest.TestCase):
         assert len(items) > 0 
         
         
-    #      
-    # Проверка работы класса start_factory
     #
-    def test_check_start_factor(self):
+    # Проверка создание списка единиц измерения
+    #    
+    def test_check_create_units(self):
+        # Подготовка
+        items = start_factory.create_units()
+        
+        # Действие
+        
+        # Проверки
+        assert len(items) > 0    
+     
+    #
+    # Проверка создания списка групп
+    # 
+    def test_check_create_groups(self):
+        # Подготовка
+        items = start_factory.create_groups()
+        
+        # Действие
+        
+        # Проверки    
+        assert len(items) > 0
+        
+        
+    #      
+    # Проверка работы класса start_factory. Метод create
+    #
+    def test_check_factory_create(self):
         # Подготовка
         manager = settings_manager()
         factory = start_factory( manager.settings )
@@ -50,11 +75,15 @@ class factory_test(unittest.TestCase):
         
         # Проверка
         if manager.settings.is_first_start == True:
-            assert len(result) > 0
+            assert result == True
             assert not factory.storage is None
             assert storage.nomenclature_key in factory.storage.data
+            assert storage.receipt_key in factory.storage.data
+            assert storage.group_key in factory.storage.data
+            assert storage.unit_key in factory.storage.data
+        else:
+            assert result == False    
         
-        assert len(result) == 0   
                      
         
        
