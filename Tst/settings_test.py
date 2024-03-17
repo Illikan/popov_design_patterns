@@ -3,9 +3,11 @@ import unittest
 
 
 #
-# Набор автотестов для проверки работы модуля настроек
+# Набор автотестов для проверки работы модуmeля настроек
 #
 class settings_test(unittest.TestCase):
+    
+ 
     
     #
     # Проверить на корректность создания и загрузки файла с настройками
@@ -21,7 +23,7 @@ class settings_test(unittest.TestCase):
         print(manager.data)
         print(type(manager.data))
         assert result is not None
-        assert int(manager.settings.inn) > 0
+        assert manager.settings.inn > 0
         assert manager.settings.short_name != ""
         
     #

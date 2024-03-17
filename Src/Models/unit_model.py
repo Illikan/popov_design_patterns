@@ -1,6 +1,8 @@
 from Src.reference import reference
 from Src.exceptions import exception_proxy, argument_exception
 
+
+
 #
 # Модель единицы измерения для номенклатуры
 #
@@ -23,14 +25,14 @@ class unit_model(reference):
         
     
     @property
-    def base_unit(self):
+    def base_unit(self) -> reference:
         """
             Базовая единица измерения
         Returns:
             _type_: _description_
         """
         return self.__base_unit
-    
+
     
     @base_unit.setter
     def base_unit(self, value: reference ):
@@ -57,10 +59,12 @@ class unit_model(reference):
         self.__coefficient = value  
         
         
+    # Фабричные методы    
+        
     @staticmethod    
     def create_gram():
         """
-            Создать единицу измерения грамм
+            Создать единицу измерения - грамм
 
         Returns:
             _type_: _description_
@@ -71,13 +75,43 @@ class unit_model(reference):
     @staticmethod
     def create_killogram():
         """
-            Создать единицу килограмм
+            Создать единицу измерения - киллограмм
         Returns:
             _type_: _description_
         """
         base = unit_model.create_gram()
         item = unit_model("киллограмм", base, 1000)
         return item
+    
+    @staticmethod
+    def create_ting():
+        """
+            Создать единицу изменения - штуки
+        Returns:
+            _type_: _description_
+        """
+        return unit_model("штука")
+    
+    def create_milliliter():
+        """
+            Создать единицу измерения - миллилитр
+        Returns:
+            _type_: _description_
+        """
+        return unit_model("миллилитр")
+    
+    def create_liter():
+        """
+            Создать единицу измерения - литр
+        Returns:
+            _type_: _description_
+        """
+        base = unit_model.create_milliliter()
+        item = unit_model("литр", base, 1000)
+        return item
+    
+    
+
         
         
         

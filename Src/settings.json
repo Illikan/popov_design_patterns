@@ -1,10 +1,6 @@
 {
-   "inn": "3800020344",
-   "bank_account": "4719748129",
-   "bic": "285476231",
-   "corresp_account": "1254654342",
-   "prop_type": "PP",
-   "short_name": "ООО Ромашка",
-   "is_first_start": false,
-   "report_format": "csv"
+   "inn":3800020344,
+   "short_name":"ООО Ромашка",
+   "is_first_start": true,
+   "report_mode":"csv"
 }

@@ -1,31 +1,43 @@
-import sys
-sys.path.append('c:\\Users\\ze_us\\Documents\\VSProjects\\Shab_proek_2_sem\\gitclone\\popov_design_patterns')
 from Src.Logics.reporting import reporting
+from Src.exceptions import operation_exception
 
+
+#
+# Класс - реализация построение данных в формате csv
+#
 class csv_reporting(reporting):
-        
-    def create(self, typeKey: str):
-
-        super().create(typeKey)
-        result = ""
-        list = []
-        #Исходные данные
-        items = self.data[ typeKey ]
-        
-        
-        #Список
-        for field in self.fields:
-            result += f"{field};"
-            
-        result = result[:-1] + '\n'
-        
-        for item in items:
-            for field in self.fields:
-                attr = getattr(item, field)
-                found_attr = reporting.make_element(attr)
-                list.append(found_attr)
-            result += ";".join(list) + "\n"
-
-        #Результат csv
-        return result
     
+    def create(self, storage_key: str):
+        super().create(storage_key)
+        result = ""
+        delimetr = ";"
+
+        # Исходные данные
+        items = self.data[ storage_key ]
+        if items == None:
+            raise operation_exception("Невозможно сформировать данные. Данные не заполнены!")
+        
+        if len(items) == 0:
+            raise operation_exception("Невозможно сформировать данные. Нет данных!")
+        
+        # Заголовок 
+        header = delimetr.join(self.fields)
+        result += f"{header}\n"
+        
+        # Данные
+        for item in items:
+            row = ""
+            for field in self.fields:
+                attribute = getattr(item.__class__, field)
+                if isinstance(attribute, property):
+                    value = getattr(item, field)
+                    if isinstance(value, (list, dict)) or value is None:
+                        value = ""
+                        
+                    row +=f"{value}{delimetr}"
+                
+            result += f"{row[:-1]}\n"
+            
+        
+        # Результат csv
+        return result
