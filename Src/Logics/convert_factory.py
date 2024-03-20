@@ -4,6 +4,7 @@ from Src.exceptions import exception_proxy, operation_exception
 from Src.reference import reference
 from Src.Logics.convertor import convertor
 
+
 import datetime
 
 #
@@ -31,8 +32,9 @@ class convert_factory:
     
     def __init__(self) -> None:
         # Связка с простыми типами
-        self._maps[datetime] = datetime_convertor
+        self._maps[datetime.datetime] = datetime_convertor
         self._maps[int] = basic_convertor
+        self._maps[float] = basic_convertor
         self._maps[str] = basic_convertor
         self._maps[bool] = basic_convertor
         

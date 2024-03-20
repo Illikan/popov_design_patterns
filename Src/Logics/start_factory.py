@@ -1,16 +1,11 @@
-import numpy as np
-from datetime import datetime
 # Модели
 from Src.Models.group_model import group_model
 from Src.Models.unit_model import unit_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.reference import reference
 from Src.Models.receipe_model import receipe_model
-from Src.Models.receipe_row_model import receipe_row_model
-from Src.Models.storage_transaction_model import storage_transaction_model
-from Src.Models.storage_turn_model import storage_turn_model
+from Src.Models.storage_row_model import storage_row_model
 from Src.Models.storage_model import storage_model
-from Src.Models.storage_type_model import storage_type_model
 
 # Системное
 from Src.settings import settings
@@ -23,7 +18,7 @@ from Src.exceptions import exception_proxy, operation_exception, argument_except
 class start_factory:
     __oprions: settings = None
     __storage: storage = None
-    __transactions: list = []
+    
     def __init__(self, _options: settings,
                  _storage: storage = None) -> None:
         
@@ -58,7 +53,7 @@ class start_factory:
     # Статические методы
     
     @staticmethod
-    def create_units():
+    def create_units() -> list:
         """
             Сформировать список единиц измерения
         Returns:
@@ -74,7 +69,7 @@ class start_factory:
         return items
     
     @staticmethod
-    def create_nomenclatures():
+    def create_nomenclatures() -> list:
         """
           Сформировать список номенклатуры
         """
@@ -84,7 +79,7 @@ class start_factory:
                   {"Сахар":"киллограмм"}, 
                   {"Сливочное масло" : "киллограмм"}, 
                   {"Яйца": "штука"}, {"Ванилин": "грамм"}, 
-                  {"Куриное филе": "киллограмм"}, 
+                  {"Куринное филе": "киллограмм"}, 
                   {"Салат Романо": "грамм"},
                   {"Сыр Пармезан" : "киллограмм"}, 
                   {"Чеснок": "киллограмм"}, 
@@ -126,7 +121,7 @@ class start_factory:
         return result
       
     @staticmethod      
-    def create_groups():
+    def create_groups() -> list:
         """
             Сформировать список групп номенклатуры
         Returns:
@@ -137,7 +132,7 @@ class start_factory:
         return items         
     
     @staticmethod
-    def create_receipts(_data: list = None):
+    def create_receipts(_data: list = None) -> list:
         """
             Сформировать список рецептов
         Args:
@@ -159,11 +154,11 @@ class start_factory:
         if len(data) == 0:
             raise argument_exception("Некорректно переданы параметры! Список номенклатуры пуст.")        
         
-        # ВАФЛИ ХРУСТЯЩИЕ В ВАФЕЛЬНИЦЕ
+        # Вафли хрустящие в вафильнице
         items = [ {"Мука пшеничная": 100}, {"Сахар": 80}, {"Сливочное масло": 70},
                   {"Яйца": 1} , {"Ванилин": 5 }
                 ]
-        item = receipe_model.create_receipt("ВАФЛИ ХРУСТЯЩИЕ В ВАФЕЛЬНИЦЕ", "", items, data)
+        item = receipe_model.create_receipt("Вафли хрустящие в вафильнице", "", items, data)
         
         # Шаги приготовления
         item.instructions.extend([
@@ -177,7 +172,7 @@ class start_factory:
         result.append( item )
         
         # Цезарь с курицей
-        items = [ {"Куриное филе": 200}, {"Салат Романо": 50}, {"Сыр Пармезан": 50},
+        items = [ {"Куринное филе": 200}, {"Салат Романо": 50}, {"Сыр Пармезан": 50},
                   {"Чеснок": 10} , {"Белый хлеб": 30 }, {"Соль": 5}, {"Черный перец": 2},
                   {"Оливковое масло": 10}, {"Лимонный сок": 5}, {"Горчица дижонская": 5},
                   {"Яйца": 2}
@@ -199,37 +194,45 @@ class start_factory:
         items = [ {"Яйца": 3}, {"Сахарная пудра":180}, {"Ванилиин" : 5}, {"Корица": 5} ,{"Какао": 20} ]
         result.append( receipe_model.create_receipt("Безе", "", items, data))
         return result
-    
-    @staticmethod      
-    def create_transaction():
-        """
-            Добавить список транзакций
-        Returns:
-            _type_: _description_
-        """
-        items = []
-        # По подобию create_receipts сделай всё то же самое
         
-        storage1 = storage_model("Storage 1")
-        storage2 = storage_model("Storage 2")
-        storage_list = [storage1, storage2]
-        nomenclature_list = start_factory.create_nomenclatures()
-        quantity_max = 1000
-        type_addition = storage_type_model("Addition")
-        type_substraction = storage_type_model("Substraction")
-        type_list = [type_addition, type_substraction]
-        units_list = start_factory.create_units()
-        date = datetime(2024, 3, 17)
-        for i in range(20):
-            transaction = storage_transaction_model("i")
-            transaction.storage = storage_list[np.random.randint(0, 2)]
-            transaction.nomenclature = nomenclature_list[np.random.randint(len(nomenclature_list))]
-            transaction.quantity = np.random.randint(1, quantity_max)
-            transaction.operation_type = type_list[np.random.randint(0, 2)]
-            transaction.unit = units_list[np.random.randint(len(units_list))]
-            transaction.period = date
-            items.append(transaction)
-        return items
+    @staticmethod
+    def create_storage_transactions(data: dict) -> list:
+        """
+            Сформировать список складских транзакций
+        Returns:
+            _type_: Массив объектов storage_row_model
+        """
+        result = []
+        default_storage = storage_model.create_default()
+            
+        if len(data.keys()) == 0:
+            raise operation_exception("Набор данных пуст. Невозможно сформировать список транзакций!")  
+        
+        items = [ { "Мука пшеничная": [1, "киллограмм"] }, 
+                  { "Черный перец": [50, "грамм" ] },
+                  { "Сахар" :[0.5, "киллограмм"] },
+                  { "Яйца": [6,"штука" ] },
+                  { "Оливковое масло": [0.2,"литр" ] },
+                  { "Куринное филе": [0.5, "киллограмм"] },
+                  { "Салат Романо": [1, "штука"] },
+                  { "Белый хлеб" : [3, "штука"] },
+                  { "Сыр Пармезан": [0.2, "киллограмм" ] },
+                  { "Горчица дижонская" : [0.1, "литр"] },
+                  { "Черный перец": [10, "грамм" ] },
+                  { "Лимонный сок": [1, "литр"] },
+                  { "Какао": [1,"киллограмм"] },
+                  { "Сыр Пармезан": [0.3, "киллограмм" ] },
+                  { "Ванилиин": [100, "грамм"] }  ]
+        
+        for element in items:
+            key = list(element.keys())[0]
+            values = list(element.values())[0]
+            
+            row = storage_row_model.create_credit_row(key, values, data, default_storage)
+            result.append(row)
+        
+        return result
+        
     
     # Основной метод
     def create(self) -> bool:
@@ -239,12 +242,12 @@ class start_factory:
             _type_: _description_
         """
         if self.__oprions.is_first_start == True:
-            # 1. Формируем и запоминаем номеклатуру
-            items = start_factory.create_nomenclatures()
-            self.__save( storage.nomenclature_key(), items )
+            # 1. Формируем и зпоминаем номеклатуру
+            nomenclatures = start_factory.create_nomenclatures()
+            self.__save( storage.nomenclature_key(), nomenclatures )
             
             # 2. Формируем и запоминаем рецепты
-            items = start_factory.create_receipts(items)
+            items = start_factory.create_receipts(nomenclatures)
             self.__save( storage.receipt_key(), items)
       
             # 3. Формируем и запоминаем единицы измерения
@@ -254,12 +257,13 @@ class start_factory:
             # 4. Формируем и запоминаем группы номенклатуры
             items = start_factory.create_groups()
             self.__save( storage.group_key(), items)
-
-            # 5. Формируем и запоминаем транзакции
-            #items = start_factory.create_transaction()
-            #self.__save( storage.group_key(), items)
-            return True
             
+            # 5. Формируем типовые складские проводки
+            items = start_factory.create_storage_transactions( self.storage.data )
+            self.__save( storage.storage_transaction_key(), items)
+            
+            return True
+           
            
         else:
             # Другой вариант. Загрузка из источника данных    

@@ -2,7 +2,7 @@ from Src.Logics.start_factory import start_factory
 from Src.settings_manager import settings_manager
 from Src.Storage.storage import storage
 from Src.Logics.report_factory import report_factory
-from Src.Logics.process_factory import process_factory
+
 import unittest
 
 #
@@ -117,35 +117,10 @@ class factory_test(unittest.TestCase):
             assert storage.receipt_key() in factory.storage.data
             assert storage.group_key() in factory.storage.data
             assert storage.unit_key() in factory.storage.data
+            assert storage.storage_transaction_key() in factory.storage.data
         else:
             assert result == False    
-    def test_check_transactions_create(self):
-        manager = settings_manager()
-        factory = start_factory( manager.settings )
         
-        
-        # Действие
-        result = factory.create_transaction()
-        
-        print(result)
-        
-        assert result != None
-        assert len(result) == 20
-        assert result[12].nomenclature.unit != None
-        print(result)             
-    
-    def test_check_turn_calculation(self):
-        manager = settings_manager()
-        factory = start_factory( manager.settings )
-        
-        
-        # Действие
-        transactions_list = factory.create_transaction()
-        result = process_factory.process_storage_turn(transactions_list)
-        for item in result:
-            print(item.quantity, item.nomenclature.name, item.storage.name)
-        assert result != None
-        assert len(result) <= 20
-        assert len(result) > 0
+                     
         
        
