@@ -1,5 +1,6 @@
 from Src.Logics.processing import processing
 from Src.Logics.turn_processing import turn_processing
+from Src.Logics.transaction_processing import transaction_processing
 from Src.Models.storage_row_model import storage_row_model
 from Src.exceptions import exception_proxy, argument_exception, operation_exception
 
@@ -17,6 +18,7 @@ class process_factory:
             Сформировать структуру
         """
         self.__maps[ process_factory.turn_key()]  = turn_processing
+        self.__maps[ process_factory.transaction_key()] = transaction_processing
         
     
     def create(self, process_key:str) -> processing:
@@ -49,6 +51,13 @@ class process_factory:
         """
         return "turns"    
     
+    def transaction_key() -> str:
+        """
+            Сформировать транзакции
+        Returns:
+            str: _description_
+        """
+        return "transactions"
       
     # Код взят: https://github.com/UpTechCompany/GitExample/blob/6665bc70c4933da12f07c0a0d7a4fc638c157c40/storage/storage.py#L30
     
