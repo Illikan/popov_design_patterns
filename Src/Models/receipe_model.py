@@ -58,6 +58,7 @@ class receipe_model(reference):
             # Получаем свойство size
             self._brutto += self._rows[position].size 
             
+
     @property     
     def brutto(self):
         """
@@ -74,6 +75,7 @@ class receipe_model(reference):
             
     @property         
     def netto(self) -> int:
+
         return self._netto                        
         
     @netto.setter
@@ -110,6 +112,7 @@ class receipe_model(reference):
         """
         exception_proxy.validate(value, str)
         self._comments = value   
+
         
     @property            
     def consist(self) -> list:
@@ -119,6 +122,7 @@ class receipe_model(reference):
             _type_: _description_
         """
         return self._rows    
+
     
     
     @staticmethod
