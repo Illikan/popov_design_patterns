@@ -3,12 +3,14 @@ from Src.exceptions import operation_exception
 
 class markdown_reporting(reporting):
     
+
       def create(self, storage_key: str):
         super().create(storage_key)
         result = []
 
         # Исходные данные
         items = self.data[ storage_key ]
+
         if items == None:
             raise operation_exception("Невозможно сформировать данные. Данные не заполнены!")
         
@@ -17,7 +19,9 @@ class markdown_reporting(reporting):
             raise operation_exception("Невозможно сформировать данные. Нет данных!")
         
         # Заголовок
+
         result.append(f"# {storage_key}")
+
         
         # Шапка таблицы
         header = ""
@@ -33,6 +37,7 @@ class markdown_reporting(reporting):
         for item in items:
             row = ""
             for field in self.fields:
+
                 attribute = getattr(item.__class__, field)
                 if isinstance(attribute, property):
                     value = getattr(item, field)
@@ -44,6 +49,4 @@ class markdown_reporting(reporting):
             result.append(f"{row}|")
             
         return "\n".join(result)        
-    
-     
     

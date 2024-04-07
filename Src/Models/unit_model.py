@@ -34,6 +34,7 @@ class unit_model(reference):
         return self.__base_unit
 
     
+    
     @base_unit.setter
     def base_unit(self, value: reference ):
         exception_proxy.validate(value, reference)
