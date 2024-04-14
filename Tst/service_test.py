@@ -3,7 +3,7 @@ from Src.Logics.start_factory import start_factory
 from Src.settings_manager import settings_manager
 from Src.Storage.storage import storage
 from Src.exceptions import operation_exception
-
+from Src.settings import settings
 from datetime import datetime
 import unittest
 
@@ -166,8 +166,26 @@ class service_test(unittest.TestCase):
           
         # Проверка (транзакций должно быть больше)   
         assert start_len_transaction < stop_len_transaction   
+    
+    def test_check_create_turnss(self):
+        # Подготовка
+        manager = settings_manager()
+        start = start_factory(manager.settings)
+        start.create()
+        stor = start.storage
+        key = storage.storage_transaction_key()
+        data = start.storage.data[ key ]
+        service = storage_service(data)
+        service.options = manager.settings
+        key = storage.turn_key()
+    
         
-            
+        # Действие
+        result = service.create_blocked_turns()
+        start.save(key, result)
+        stor.save()
+        # Проверки
+        assert len(stor.data[key]) > 0   
         
             
             

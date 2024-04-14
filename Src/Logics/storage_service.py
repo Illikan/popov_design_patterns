@@ -7,12 +7,14 @@ from Src.Models.receipe_model import receipe_model
 from Src.Models.storage_model import storage_model
 from Src.Models.receipe_row_model import receipe_row_model
 from Src.Storage.storage import storage
-
 from datetime import datetime
+from Src.settings import settings
 import json
 
 class storage_service:
     __data = []
+    __options=None
+
     
     def __init__(self, data: list) -> None:
         if len(data) == 0:
@@ -55,9 +57,13 @@ class storage_service:
         """
         exception_proxy.validate(start_period, datetime)
         exception_proxy.validate(stop_period, datetime)
-        
+        block_period = self.__options.block_period
         if start_period > stop_period:
             raise argument_exception("Некорректно переданы параметры!")
+        if block_period < start_period:
+            raise argument_exception("Некорректно переданы параметры!")
+        if block_period < stop_period:
+            stop_period = block_period
         
         # Фильтруем      
         prototype = storage_prototype(  self.__data )  
@@ -80,10 +86,13 @@ class storage_service:
         exception_proxy.validate(start_period, datetime)
         exception_proxy.validate(stop_period, datetime)
         exception_proxy.validate(nomenclature, nomenclature_model)
-        
+        block_period = self.__options.block_period
         if start_period > stop_period:
             raise argument_exception("Некорректно переданы параметры!")
-        
+        if block_period < start_period:
+            raise argument_exception("Некорректно переданы параметры!")
+        if block_period < stop_period:
+            stop_period = block_period
         # Фильтруем      
         prototype = storage_prototype(  self.__data )  
         filter = prototype.filter_by_period( start_period, stop_period)
@@ -167,6 +176,40 @@ class storage_service:
         data = storage().data[ key ]
         for transaction in transactions:
             data.append ( transaction )
+    
+    @property
+    def options(self):
+        return self.__options
+
+    @options.setter
+    def options(self,value:settings):
+        if not isinstance(value,settings):
+            raise argument_exception("неверный аргумент")
+        self.__options=value
+    
+    def create_blocked_turns(self) -> list:
+        """
+            Получить обороты за период
+        Args:
+            start_period (datetime): Начало
+            stop_period (datetime): Окончание
+
+        Returns:
+            list: обороты за период
+        """
+        start_period = datetime(1999,1,1)
+        exception_proxy.validate(start_period, datetime)
+        stop_period = self.__options.block_period
+        exception_proxy.validate(stop_period, datetime)
+        
+        if start_period > stop_period:
+            raise argument_exception("Некорректно переданы параметры!")
+        
+        # Фильтруем      
+        prototype = storage_prototype(  self.__data )  
+        filter = prototype.filter_by_period( start_period, stop_period)
+        
+        return self.__processing( filter. data )
     
     # Набор основных методов        
     
