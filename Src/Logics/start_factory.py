@@ -4,8 +4,10 @@ from Src.Models.unit_model import unit_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.reference import reference
 from Src.Models.receipe_model import receipe_model
+
 from Src.Models.storage_row_model import storage_row_model
 from Src.Models.storage_model import storage_model
+
 
 # Системное
 from Src.settings import settings
@@ -53,11 +55,15 @@ class start_factory:
     # Статические методы
     
     @staticmethod
+
     def create_units() -> list:
+
         """
             Сформировать список единиц измерения
         Returns:
             _type_: _description_
+
+
         """
         items = []
         items.append( unit_model.create_gram() )
@@ -66,6 +72,7 @@ class start_factory:
         items.append( unit_model.create_milliliter() )
         items.append( unit_model.create_ting() )
         
+
         return items
     
     @staticmethod
@@ -143,10 +150,13 @@ class start_factory:
         Raises:
             argument_exception: _description_
 
+
         Returns:
             _type_: Массив объектов receipe_model
         """
+
         result = []        
+
         if _data is None:
             data = start_factory.create_nomenclatures()
         else:
@@ -277,6 +287,7 @@ class start_factory:
                 raise operation_exception(f"Ошибка при формировании шаблонных данных!\n{ex}")     
 
             
+
         
             
             
