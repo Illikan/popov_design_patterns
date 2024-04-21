@@ -109,13 +109,12 @@ class factory_test(unittest.TestCase):
         factory.create()
         
         # Проверка
-
         assert not factory.storage is None
         assert storage.nomenclature_key() in factory.storage.data
         assert storage.receipt_key() in factory.storage.data
         assert storage.group_key() in factory.storage.data
         assert storage.unit_key() in factory.storage.data
-
+        assert storage.storage_transaction_key() in factory.storage.data
         
                      
         

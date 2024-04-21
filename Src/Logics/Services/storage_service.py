@@ -1,26 +1,26 @@
-from Src.Logics.convert_factory import convert_factory
 from Src.Logics.process_factory import process_factory
 from Src.Logics.storage_prototype import storage_prototype
 from Src.exceptions import argument_exception, exception_proxy, operation_exception
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Models.receipe_model import receipe_model
-from Src.Models.storage_model import storage_model
-from Src.Models.receipe_row_model import receipe_row_model
 from Src.Storage.storage import storage
+from Src.Logics.Services.service import service
+from Src.Models.event_type import event_type
+from Src.Logics.storage_observer import storage_observer
+
 
 from datetime import datetime
-import json
 
-class storage_service:
-    __data = []
+#
+# Сервис для работы со складскими операциями
+#
+class storage_service(service):
     
     def __init__(self, data: list) -> None:
-        if len(data) == 0:
-            raise argument_exception("Некорректно переданы параметры!")
-        
-        self.__data = data
-        
-    def __processing(self, data: list) -> list:
+        super().__init__(data)
+        storage_observer.observers.append(self)
+    
+    def __build_turns(self, data: list) -> list:
         """
             Сформировать обороты
         Args:
@@ -40,6 +40,24 @@ class storage_service:
         turns =  processing().process( data )
         return turns
             
+    def __build_blocked_turns(self):
+        """
+            Сформировать и сохранить обороты в закрытом периоде
+        """
+        start_period = datetime.strptime("1900-01-01", "%Y-%m-%d")   
+        stop_period = self.settings.block_period
+        
+        # Фильтруем по периоду
+        prototype = storage_prototype(  self.data )  
+        filter = prototype.filter_by_period( start_period, stop_period)
+        if len(filter.data) == 0:
+            storage().save_blocked_turns( [] )
+        else:    
+            # Расчитываем 
+            calculated_turns = self.__build_turns(filter.data)
+        
+            # Сохраняем данные
+            storage().save_blocked_turns(calculated_turns)
         
     # Набор основных методов    
         
@@ -59,12 +77,19 @@ class storage_service:
         if start_period > stop_period:
             raise argument_exception("Некорректно переданы параметры!")
         
-        # Фильтруем      
-        prototype = storage_prototype(  self.__data )  
-        filter = prototype.filter_by_period( start_period, stop_period)
+        block_period = self.settings.block_period
         
-        return self.__processing( filter. data )
-            
+        # Фильтруем      
+        prototype = storage_prototype(  self.data )  
+        filter = prototype.filter_by_period( block_period, stop_period)
+        
+        # Рассчитанные обороты
+        calculated_turns = self.__build_turns( filter. data )
+        
+        # Сформируем результат
+        aggregate_key = process_factory.aggregate_key()
+        processing = process_factory().create( aggregate_key  )
+        return processing().process( calculated_turns )
         
     def create_turns_by_nomenclature(self, start_period: datetime, stop_period: datetime, nomenclature: nomenclature_model) -> list:
         """
@@ -84,14 +109,22 @@ class storage_service:
         if start_period > stop_period:
             raise argument_exception("Некорректно переданы параметры!")
         
+        block_period = self.settings.block_period
+        
         # Фильтруем      
-        prototype = storage_prototype(  self.__data )  
-        filter = prototype.filter_by_period( start_period, stop_period)
+        prototype = storage_prototype(  self.data )  
+        filter = prototype.filter_by_period( block_period, stop_period)
         filter = filter.filter_by_nomenclature( nomenclature )
         if not filter.is_empty:
             raise operation_exception(f"Невозможно сформировать обороты по указанным данных: {filter.error}")
-            
-        return self.__processing( filter. data )    
+        
+        # Рассчитанные обороты    
+        calculated_turns =  self.__build_turns( filter. data )   
+        
+        # Сформируем результат
+        aggregate_key = process_factory.aggregate_key()
+        processing = process_factory().create( aggregate_key  )
+        return processing().process( calculated_turns ) 
     
     def create_turns_only_nomenclature(self, nomenclature: nomenclature_model) -> list:
         """
@@ -103,12 +136,12 @@ class storage_service:
             list: Обороты
         """
         exception_proxy.validate(nomenclature, nomenclature_model)
-        prototype = storage_prototype(  self.__data )  
+        prototype = storage_prototype(  self.data )  
         filter = prototype.filter_by_nomenclature( nomenclature )
         if not filter.is_empty:
             raise operation_exception(f"Невозможно сформировать обороты по указанным данных: {filter.error}")
          
-        return self.__processing( filter. data )   
+        return self.__build_turns( filter. data )   
     
     def create_turns_by_receipt(self, receipt: receipe_model) -> list:
         """
@@ -126,17 +159,16 @@ class storage_service:
         
         # Отфильтровать по рецепту
         transactions = []
-        filter =  storage_prototype(  self.__data )
+        filter =  storage_prototype(  self.data )
         for item in receipt.rows():
             filter =  filter.filter_by_nomenclature( item.nomenclature )
             if filter.is_empty:
                 for transaction in filter.data:
                     transactions.append( transaction )
                     
-            filter.data = self.__data        
+            filter.data = self.data        
             
-        return self.__processing( transactions )     
-            
+        return self.__build_turns( transactions )     
     
     def build_debits_by_receipt(self, receipt: receipe_model) -> list:
         """
@@ -168,33 +200,18 @@ class storage_service:
         for transaction in transactions:
             data.append ( transaction )
     
-    # Набор основных методов        
+    # Набор основных методов   
+        
+    def handle_event(self, handle_type: str):
+        """
+            Обработать событие
+        Args:
+            handle_type (str): _description_
+        """
+        super().handle_event(handle_type)
+        
+        if handle_type == event_type.changed_block_period():
+            self.__build_blocked_turns()
+        
     
-    def data(self) -> list:
-        """
-            Получить отфильтрованные данные
-        Returns:
-            list: _description_
-        """
-        return self.__data    
-        
-    @staticmethod        
-    def create_response( data: list, app):
-        """"
-            Сформировать данные для сервера
-        """
-        if app is None:
-            raise argument_exception("Некорректно переданы параметры!")
-
-        # Преоброзование
-        data = convert_factory().serialize( data )
-        json_text = json.dumps( data, sort_keys = True, indent = 4,  ensure_ascii = False)  
-   
-        # Подготовить ответ    
-        result = app.response_class(
-            response = f"{json_text}",
-            status = 200,
-            mimetype = "application/json; charset=utf-8"
-        )
-        
-        return result
+  

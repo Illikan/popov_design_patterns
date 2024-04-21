@@ -46,6 +46,12 @@ class reference(ABC):
     def id(self):
         " Уникальный код записи "
         return str(self._id.hex)  
+    
+    @id.setter
+    def id(self, value:uuid.UUID ):
+        " Уникальный код записи "
+        exception_proxy.validate(value, uuid.UUID)
+        self._id = value
 
     @property
     def is_error(self):
@@ -89,7 +95,6 @@ class reference(ABC):
             result[ position.name ] = position
            
         return result   
-
    
     @staticmethod
     def create_fields(source) -> list:
@@ -114,7 +119,6 @@ class reference(ABC):
                 result.append(item)
                     
         return result
-
     
     def __str__(self) -> str:
         """
@@ -123,7 +127,6 @@ class reference(ABC):
             str: _description_
         """
         return self.id
-
     
     def __hash__(self) -> int:
         """
@@ -132,7 +135,6 @@ class reference(ABC):
             int: _description_
         """
         return hash(self.id)
-
     
     
                 
