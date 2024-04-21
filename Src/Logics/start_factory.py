@@ -16,6 +16,7 @@ from Src.exceptions import exception_proxy, operation_exception, argument_except
 # Класс для обработки данных. Начало работы приложения
 #
 class start_factory:
+    
     __oprions: settings = None
     __storage: storage = None
     
