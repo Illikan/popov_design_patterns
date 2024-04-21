@@ -1,4 +1,4 @@
-from Src.Logics.processing import processing
+from Src.Logics.Processings.processing import processing
 from Src.Models.receipe_row_model import receipe_row_model
 
 from datetime import datetime

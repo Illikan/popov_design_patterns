@@ -230,10 +230,7 @@ class start_factory:
             result.append(row)
         
         return result
-    
-    def save(self, key:str, items: list):
-        self.__save(key, items)
-        return True
+        
     
     # Основной метод
     def create(self) -> bool:
@@ -268,7 +265,6 @@ class start_factory:
                 # 5. Формируем типовые складские проводки
                 items = start_factory.create_storage_transactions( self.storage.data )
                 self.__save( storage.storage_transaction_key(), items)
-                
             
             except Exception as ex:
                 raise operation_exception(f"Ошибка при формировании шаблонных данных!\n{ex}")        

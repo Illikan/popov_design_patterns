@@ -1,4 +1,4 @@
-from Src.Logics.processing import processing
+from Src.Logics.Processings.processing import processing
 from Src.Models.storage_row_turn_model import storage_row_turn_model
 
 
