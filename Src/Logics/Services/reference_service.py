@@ -12,8 +12,9 @@ class reference_service(service):
     __data = []
     def __init__(self, data: list) -> None:
         super().__init__(data)
+        self.__data = data
         storage_observer.observers.append(self)
-        __data = data
+        
     def add(self, item: reference) -> bool:
         """
             Добавить новый элемент
