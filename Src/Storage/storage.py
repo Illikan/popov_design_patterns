@@ -48,7 +48,7 @@ class storage():
             if not os.path.exists(data_file):
                 raise operation_exception(f"Невозможно загрузить данные! Не найден файл {data_file}")
 
-            with open(data_file, "r", encoding="latin-1") as read_file:
+            with open(data_file, "r") as read_file:
                 source =  json.load(read_file)   
                 
                 self.__data = {}
@@ -80,7 +80,7 @@ class storage():
 
         try:
             factory = convert_factory()
-            with open(data_file, "w", encoding="utf-8") as write_file:
+            with open(data_file, "w") as write_file:
                 data = factory.serialize( self.data )
                 json_text = json.dumps(data, sort_keys = True, indent = 4, ensure_ascii = False)  
                 write_file.write(json_text)
@@ -99,7 +99,7 @@ class storage():
         exception_proxy.validate(turns, list)
         if len(turns) > 0:
             self.__data[ storage.blocked_turns_key() ] = turns
-            self.save()
+            # self.save()
             
             
     @staticmethod
