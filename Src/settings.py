@@ -2,7 +2,7 @@ from Src.exceptions import exception_proxy, argument_exception
 from Src.Logics.storage_observer import storage_observer
 from Src.Models.event_type import event_type
 from datetime import datetime
-
+from Src.Models.logging_type import logging_type
 #
 # Класс для описания настроек
 #
@@ -12,7 +12,7 @@ class settings():
     _first_start = True
     _mode = "csv"
     _block_period = datetime.now
-    
+    _logging_categories = {}
     
     @property
     def inn(self):
@@ -100,4 +100,17 @@ class settings():
         else:
             raise argument_exception("Некорректно переданы параметры!")
             
+    @property
+    def logging_categories(self):
+        """
+            Категории логирования
+        Returns:
+            int: 
+        """
+        return self._logging_categories
     
+    @logging_categories.setter
+    def logging_categories(self, key: str, value: str):
+        exception_proxy.validate(value, str)
+        exception_proxy.validate(key, str)
+        self._logging_categories[key] = value

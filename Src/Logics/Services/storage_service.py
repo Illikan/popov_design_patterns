@@ -8,7 +8,8 @@ from Src.Logics.Services.service import service
 from Src.Models.event_type import event_type
 from Src.Logics.storage_observer import storage_observer
 from Src.reference import reference
-
+from Src.Models.log_model import log_model
+from Src.Logics.logging_observer import logging_observer
 
 from datetime import datetime
 
@@ -90,6 +91,12 @@ class storage_service(service):
         # Сформируем результат
         aggregate_key = process_factory.aggregate_key()
         processing = process_factory().create( aggregate_key  )
+        
+        log = log_model()
+        log.name = "сreate turns log"
+        log.construct_log(self.options.settings.logging_categories["storage_service"], "storage_service_create_turns()", "Success")
+        logging_observer.observers.append(log)
+        
         return processing().process( calculated_turns )
         
     def create_turns_by_nomenclature(self, start_period: datetime, stop_period: datetime, nomenclature: nomenclature_model) -> list:
@@ -125,6 +132,10 @@ class storage_service(service):
         # Сформируем результат
         aggregate_key = process_factory.aggregate_key()
         processing = process_factory().create( aggregate_key  )
+        log = log_model()
+        log.name = "сreate turns by nomenclature log"
+        log.construct_log(self.options.settings.logging_categories["storage_service"], "storage_service_create_turns_by_nomenclature()", "Success")
+        logging_observer.observers.append(log)
         return processing().process( calculated_turns ) 
     
     def create_turns_only_nomenclature(self, nomenclature: nomenclature_model) -> list:
@@ -141,7 +152,12 @@ class storage_service(service):
         filter = prototype.filter_by_nomenclature( nomenclature )
         if not filter.is_empty:
             raise operation_exception(f"Невозможно сформировать обороты по указанным данных: {filter.error}")
-         
+        
+        log = log_model()
+        log.name = "сreate turns only nomenclature log"
+        log.construct_log(self.options.settings.logging_categories["storage_service"], "storage_service_create_turns_only_nomenclature()", "Success")
+        logging_observer.observers.append(log)
+        
         return self.__build_turns( filter. data )   
     
     def create_turns_by_receipt(self, receipt: receipe_model) -> list:
@@ -168,7 +184,12 @@ class storage_service(service):
                     transactions.append( transaction )
                     
             filter.data = self.data        
-            
+        
+        log = log_model()
+        log.name = "сreate turns by receipt log"
+        log.construct_log(self.options.settings.logging_categories["storage_service"], "storage_service_create_turns_by_receipt()", "Success")
+        logging_observer.observers.append(log)
+        
         return self.__build_turns( transactions )     
     
     def build_debits_by_receipt(self, receipt: receipe_model) -> list:
@@ -200,7 +221,12 @@ class storage_service(service):
         data = storage().data[ key ]
         for transaction in transactions:
             data.append ( transaction )
-    
+
+        log = log_model()
+        log.name = "build debits by receipt log"
+        log.construct_log(self.options.settings.logging_categories["storage_service"], "storage_service_build_debits_by_receipt()", "Success")
+        logging_observer.observers.append(log)
+        
     # Набор основных методов   
         
     def handle_event(self,  handle_type:  str):

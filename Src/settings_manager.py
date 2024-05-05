@@ -6,7 +6,8 @@ from Src.settings import settings
 from Src.errors import error_proxy
 from Src.exceptions import exception_proxy, operation_exception
 from Src.Logics.convert_factory import convert_factory
-
+from Src.Logics.logging_observer import logging_observer
+from Src.Models.log_model import log_model
 #
 # Менеджер настроек
 #   
@@ -105,6 +106,11 @@ class settings_manager(object):
                 data = factory.serialize( self._settings )
                 json_text = json.dumps(data, sort_keys = True, indent = 4, ensure_ascii = False)  
                 write_file.write(json_text)
+                
+                log = log_model()
+                log.name = "save settings log"
+                log.construct_log(self.options.settings.logging_categories["settings"], "settings_save()", "Success")
+                logging_observer.observers.append(log)
                 
                 return True
         except Exception as ex:

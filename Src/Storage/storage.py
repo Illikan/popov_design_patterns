@@ -162,6 +162,15 @@ class storage():
     # Код взят: https://github.com/UpTechCompany/GitExample/blob/6665bc70c4933da12f07c0a0d7a4fc638c157c40/storage/storage.py#L30
     
     @staticmethod
+    def logs_key():
+        """
+            Список логов
+        Returns:
+            _type_: _description_
+        """
+        return "log_model"
+    
+    @staticmethod
     def storage_keys(cls):
         """
             Получить список ключей
@@ -175,6 +184,7 @@ class storage():
                 keys.append(method())
         return keys
     
+        
 
     def Ok( app):
         """"

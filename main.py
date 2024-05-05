@@ -9,7 +9,8 @@ from Src.Logics.Services.storage_service import storage_service
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Logics.Services.service import service
 from Src.Logics.Services.reference_service import reference_service
-
+from Src.Models.log_model import log_model
+from Src.Logics.logging_observer import logging_observer
 
 
 app = Flask(__name__)
@@ -39,7 +40,11 @@ def get_report(storage_key: str):
     
     # Формируем результат
     try:
-        result = report.create_response( options.settings.report_mode, data, storage_key, app )  
+        result = report.create_response( options.settings.report_mode, data, storage_key, app )
+        log = log_model()
+        log.name = "get report log"
+        log.construct_log(options.settings.logging_categories["main"], "main_get_report()", "Success")
+        logging_observer.observers.append(log.log_info())
         return result
     except Exception as ex:
         return error_proxy.create_error_response(app, f"Ошибка при формировании отчета {ex}", 500)
@@ -68,6 +73,10 @@ def get_turns():
     source_data = start.storage.data[  storage.storage_transaction_key()   ]      
     data = storage_service( source_data   ).create_turns( start_date, stop_date )      
     result = service.create_response( app, data )
+    log = log_model()
+    log.name = "get turns log"
+    log.construct_log(options.settings.logging_categories["main"], "main_get_turns()", "Success")
+    logging_observer.observers.append(log.log_info())
     return result
       
 @app.route("/api/storage/<nomenclature_id>/turns", methods = ["GET"] )
@@ -102,6 +111,10 @@ def get_turns_nomenclature(nomenclature_id):
       
     data = storage_service( transactions_data  ).create_turns_by_nomenclature( start_date, stop_date, nomenclature )      
     result = service.create_response( data, app )
+    log = log_model()
+    log.name = "get turns nomenclature log"
+    log.construct_log(options.settings.logging_categories["main"], "main_get_turns_nomenclature()", "Success")
+    logging_observer.observers.append(log.log_info())
     return result      
 
 # Складские операции
@@ -117,6 +130,10 @@ def add_nomenclature():
         item = nomenclature_model().load(data)
         source_data = start.storage.data[  storage.nomenclature_key() ]
         result = reference_service( source_data ).add( item )
+        log = log_model()
+        log.name = "add nomenclature log"
+        log.construct_log(options.settings.logging_categories["main"], "main_add_nomenclature()", "Success")
+        logging_observer.observers.append(log.log_info())
         return service.create_response( {"result": result} )
     except Exception as ex:
         return error_proxy.create_error_response(app,   f"Ошибка при добавлении данных!\n {ex}")
@@ -132,6 +149,10 @@ def delete_nomenclature():
         item = nomenclature_model().load(data)
         source_data = start.storage.data[  storage.nomenclature_key() ]
         result = reference_service( source_data ).delete( item )
+        log = log_model()
+        log.name = "delete nomenclature log"
+        log.construct_log(options.settings.logging_categories["main"], "main_delete_nomenclature()", "Success")
+        logging_observer.observers.append(log.log_info())
         return service.create_response( {"result": result} )
     except Exception as ex:
         return error_proxy.create_error_response(app,   f"Ошибка при удалении данных!\n {ex}")
@@ -147,6 +168,10 @@ def change_nomenclature():
         item = nomenclature_model().load(data)
         source_data = start.storage.data[  storage.nomenclature_key() ]
         result = reference_service( source_data ).change( item )
+        log = log_model()
+        log.name = "change nomenclature log"
+        log.construct_log(options.settings.logging_categories["main"], "main_change_nomenclature()", "Success")
+        logging_observer.observers.append(log.log_info())
         return service.create_response( {"result": result} )
     except Exception as ex:
         return error_proxy.create_error_response(app,   f"Ошибка при изменении данных!\n {ex}")
@@ -161,12 +186,20 @@ def get_nomenclature():
         # Вывод всех элементов
         source_data = start.storage.data[  storage.nomenclature_key() ]
         result = reference_service(source_data ).get()
+        log = log_model()
+        log.name = "get all nomenclatures log"
+        log.construct_log(options.settings.logging_categories["main"], "main_get_nomenclature()", "Success")
+        logging_observer.observers.append(log.log_info())
         return service.create_response(app, result)
     else:
         # Вывод конкретного элемента
         try:
             source_data = start.storage.data[  storage.nomenclature_key() ]
             result = reference_service(source_data ).get_item(args["id"])
+            log = log_model()
+            log.name = "get particular nomenclature log"
+            log.construct_log(options.settings.logging_categories["main"], "main_get_nomenclature()", "Success")
+            logging_observer.observers.append(log.log_info())
             return service.create_response(app, result)
         except Exception as ex:
             return error_proxy.create_error_response(app,   f"Ошибка при получении данных!\n {ex}")
@@ -187,6 +220,10 @@ def get_block_period():
            return error_proxy.create_error_response(app, "Некорректно перпеданы параметры: period", 400)    
 
     result = [options.settings.block_period.strftime('%Y-%m-%d')]
+    log = log_model()
+    log.name = "get block period log"
+    log.construct_log(options.settings.logging_categories["main"], "main_get_block_period()", "Success")
+    logging_observer.observers.append(log.log_info())
     return service.create_response(app, result)
 
 
