@@ -1,4 +1,4 @@
 # unit_model
-|base_unit|coefficient|description|id|is_error|name|
-|--|--|--|--|--|--|
-||1||61de36995b834045851fabdc217de365|True|грамм|
+|base_unit|coefficient|description|id|name|
+|--|--|--|--|--|
+||1||7159bf3b1c734e36982af658f95561d6|грамм|
