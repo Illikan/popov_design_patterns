@@ -23,12 +23,21 @@ class event_type(reference):
             str: _description_
         """
         return "deleted_nomenclature"
+
+    @staticmethod
+    def write_log() -> str:
+        """
+            Событие - запись в лог
+        Returns:
+            str: _description_ 
+        """
+        return "write_log"    
     
     @staticmethod
-    def loggable_operation() -> str:
+    def save_log() -> str:
         """
-            Событие о логировании операции
+            Событие - сохранить лог
         Returns:
-            str: _description_
+            str: _description_    
         """
-        return "loggable_operation"
+        return "save_log"

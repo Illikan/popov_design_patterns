@@ -6,8 +6,7 @@ from Src.settings import settings
 from Src.errors import error_proxy
 from Src.exceptions import exception_proxy, operation_exception
 from Src.Logics.convert_factory import convert_factory
-from Src.Logics.logging_observer import logging_observer
-from Src.Models.log_model import log_model
+
 #
 # Менеджер настроек
 #   
@@ -47,6 +46,7 @@ class settings_manager(object):
         settings_file = "%s/%s" % (file_path[0], self._settings_file_name)
         if not os.path.exists(settings_file):
             self._error.set_error( Exception("ERROR: Невозможно загрузить настройки! Не найден файл %s", settings_file))
+            return
 
         try:
             with open(settings_file, "r") as read_file:
@@ -75,6 +75,8 @@ class settings_manager(object):
         """
             Private: Загрузить словарь в объект
         """
+        if self._data == None:
+            return
         
         if len(self._data) == 0:
             return
@@ -106,11 +108,6 @@ class settings_manager(object):
                 data = factory.serialize( self._settings )
                 json_text = json.dumps(data, sort_keys = True, indent = 4, ensure_ascii = False)  
                 write_file.write(json_text)
-                
-                log = log_model()
-                log.name = "save settings log"
-                log.construct_log(self.options.settings.logging_categories["settings"], "settings_save()", "Success")
-                logging_observer.observers.append(log)
                 
                 return True
         except Exception as ex:
