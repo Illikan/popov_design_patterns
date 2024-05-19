@@ -1,6 +1,6 @@
 from Src.errors import error_proxy 
 from Src.Logics.Services.log_service import log_service
-
+from Src.Logics.Services.console_log_service import console_log_service
 import unittest
 
 #
@@ -11,7 +11,7 @@ class error_proxy_test(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         log_service()
-    
+        # console_log_service()
     #
     # Проверить простой сбособ  создания объекта с ошибкой
     #
